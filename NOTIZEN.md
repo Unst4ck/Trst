@@ -10,7 +10,7 @@ Die Daten werden nur auf dem Gerät gespeichert (im Browser-Speicher „localSto
 
 ## Was wir gemacht haben
 - [x] Teil 1: Titel „Meine Einkaufsliste“, Eingabefeld, Knopf „Hinzufügen“, Liste der Artikel
-- [ ] Teil 2: Artikel als erledigt markieren (durchgestrichen) und löschen
+- [x] Teil 2: Artikel als erledigt markieren (durchgestrichen) und löschen
 - [ ] Teil 3: Liste automatisch speichern und beim Öffnen wieder anzeigen
 - [ ] Teil 4: App aufs iPhone bringen (Internet-Adresse + „Zum Home-Bildschirm“)
 

@@ -103,6 +103,43 @@
   }
   ul.items li:first-child { border-top: 0; }
   .name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  li.done .name { text-decoration: line-through; color: var(--muted); }
+
+  /* Runder Haken-Knopf links: leer = offen, grün gefüllt = erledigt */
+  button.check {
+    flex: none;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 2px solid var(--line);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--accent-fg);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+  button.check svg { width: 16px; height: 16px; opacity: 0; }
+  li.done button.check { background: var(--accent); border-color: var(--accent); }
+  li.done button.check svg { opacity: 1; }
+
+  /* Löschen-Knopf rechts */
+  button.delete {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    margin-right: -8px;
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+  button.delete svg { width: 20px; height: 20px; }
+  button.check:focus-visible, button.delete:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   .empty { margin: 0; padding: 28px 16px; text-align: center; color: var(--muted); }
 </style>
@@ -124,8 +161,11 @@
 </main>
 
 <script>
-  // Alle Artikel der Liste. Jeder Artikel hat einen Namen.
+  // Alle Artikel der Liste. Jeder Artikel hat einen Namen und ist erledigt oder nicht.
   let items = [];
+
+  const CHECK_ICON = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>';
+  const TRASH_ICON = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 5.5h13M8 5.5V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1.5M5 5.5l.8 10.6a1 1 0 0 0 1 .9h6.4a1 1 0 0 0 1-.9L15 5.5M8.3 9v5M11.7 9v5"/></svg>';
 
   const form = document.getElementById("add-form");
   const input = document.getElementById("item-input");
@@ -136,17 +176,43 @@
   // Zeichnet die Liste neu auf den Bildschirm.
   function render() {
     list.innerHTML = "";
-    for (const item of items) {
+    items.forEach((item, index) => {
       const li = document.createElement("li");
+      if (item.done) li.className = "done";
+
+      const check = document.createElement("button");
+      check.type = "button";
+      check.className = "check";
+      check.innerHTML = CHECK_ICON;
+      check.setAttribute("aria-pressed", item.done ? "true" : "false");
+      check.setAttribute("aria-label", (item.done ? "Wieder offen: " : "Erledigt: ") + item.name);
+      check.addEventListener("click", () => {
+        item.done = !item.done;
+        render();
+      });
+
       const name = document.createElement("span");
       name.className = "name";
       name.textContent = item.name;
-      li.appendChild(name);
+
+      const del = document.createElement("button");
+      del.type = "button";
+      del.className = "delete";
+      del.innerHTML = TRASH_ICON;
+      del.setAttribute("aria-label", "Löschen: " + item.name);
+      del.addEventListener("click", () => {
+        items.splice(index, 1);
+        render();
+      });
+
+      li.append(check, name, del);
       list.appendChild(li);
-    }
+    });
     list.hidden = items.length === 0;
     empty.hidden = items.length !== 0;
-    count.textContent = items.length === 1 ? "1 Artikel" : items.length + " Artikel";
+    const open = items.filter((item) => !item.done).length;
+    const total = items.length === 1 ? "1 Artikel" : items.length + " Artikel";
+    count.textContent = items.length ? total + ", davon " + open + " offen" : total;
   }
 
   // Neuer Artikel über den Knopf "Hinzufügen" oder die Enter-Taste.
@@ -154,7 +220,7 @@
     event.preventDefault();
     const name = input.value.trim();
     if (!name) return;
-    items.push({ name: name });
+    items.push({ name: name, done: false });
     input.value = "";
     input.focus();
     render();
