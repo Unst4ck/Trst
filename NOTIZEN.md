@@ -3,26 +3,35 @@
 ## Was ist das?
 Eine einfache Einkaufslisten-App für mich selbst, zuerst für das iPhone.
 Die Daten werden nur auf dem Gerät gespeichert (im Browser-Speicher „localStorage“).
+Nach dem ersten Öffnen funktioniert die App auch ohne Internet.
 
 ## Technik
-- Eine einzige Datei: `index.html` (HTML + CSS + JavaScript).
-- Kein Server, keine Anmeldung, keine Kosten.
+- `index.html`: die ganze App (HTML + CSS + JavaScript)
+- `manifest.json`: Name und Symbol für den Home-Bildschirm
+- `sw.js`: „Service Worker“, legt die App auf dem Gerät ab, damit sie offline startet
+- `icons/`: das App-Symbol in verschiedenen Größen
+- Kein Server, keine Anmeldung, keine Kosten. Die Seite liegt kostenlos bei GitHub Pages.
 
 ## Was wir gemacht haben
 - [x] Teil 1: Titel „Meine Einkaufsliste“, Eingabefeld, Knopf „Hinzufügen“, Liste der Artikel
 - [x] Teil 2: Artikel als erledigt markieren (durchgestrichen) und löschen
 - [x] Teil 3: Liste automatisch speichern und beim Öffnen wieder anzeigen
-- [ ] Teil 4: App aufs iPhone bringen (Internet-Adresse + „Zum Home-Bildschirm“)
+- [x] Teil 4a: Offline-Funktion und App-Symbol eingebaut
+- [ ] Teil 4b: GitHub Pages einschalten und App auf den iPhone-Home-Bildschirm legen
 
 ## Was noch fehlt / Ideen für später
 - Mehrere Listen (z. B. Supermarkt, Drogerie)
 - Verbindung zum PC (Liste auf mehreren Geräten sehen)
 - Später eine „richtige“ iPhone-App
-- Entscheidung offen: Projekt auf GitHub öffentlich machen (kostenlos, GitHub Pages)
-  oder privat lassen und einen anderen kostenlosen Anbieter nutzen
 
 ## Wie man das Projekt öffnet
-- **Vorschau (gerade):** Link in der Claude-App öffnen:
-  https://claude.ai/artifact/Ud3BYnta4Ns4zqqhFtzzh6
-  (Hinweis: Das ist nur zum Ausprobieren. Für die dauerhafte Nutzung kommt in Teil 4 eine eigene Adresse.)
+- **Auf dem iPhone (dauerhaft):** https://unst4ck.github.io/Trst/ in Safari öffnen,
+  dann „Teilen“ → „Zum Home-Bildschirm“. Ab dann immer über das Symbol öffnen
+  (Safari und das Symbol haben getrennte Speicher).
+- **Vorschau in Claude:** https://claude.ai/artifact/Ud3BYnta4Ns4zqqhFtzzh6
+  (nur zum Ausprobieren, Speichern dort nicht zuverlässig)
 - **Am Computer:** Die Datei `index.html` herunterladen und doppelt anklicken.
+
+## Wichtig für Änderungen (für Claude / Entwickler)
+- Nach jeder Änderung an `index.html` oder anderen Dateien in `sw.js` die
+  Versionsnummer `CACHE` erhöhen, sonst sieht das iPhone die neue Version erst beim übernächsten Öffnen.
