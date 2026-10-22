@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meine Einkaufsliste</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  /* Layout: eine schmale Spalte wie ein Notizzettel, Eingabe oben, Liste darunter */
+  :root {
+    --bg: #f3f6f2;
+    --surface: #ffffff;
+    --fg: #1d2620;
+    --muted: #66726a;
+    --line: #dde4dc;
+    --accent: #2f7a46;
+    --accent-fg: #ffffff;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121713; --surface: #1b221d; --fg: #e6ece7; --muted: #95a39a;
+      --line: #2c372f; --accent: #5cb878; --accent-fg: #0d1a11; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121713; --surface: #1b221d; --fg: #e6ece7; --muted: #95a39a;
+    --line: #2c372f; --accent: #5cb878; --accent-fg: #0d1a11; color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+    font-size: 17px;
+    line-height: 1.4;
+    -webkit-text-size-adjust: 100%;
+  }
+  main {
+    max-width: 34rem;
+    margin: 0 auto;
+    padding-block: 28px 48px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    display: grid;
+    gap: 20px;
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .count { margin: 4px 0 0; color: var(--muted); font-size: 0.95rem; }
+
+  form { display: flex; gap: 8px; }
+  input[type="text"] {
+    flex: 1;
+    min-width: 0;
+    font: inherit;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--fg);
+  }
+  input[type="text"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+  button.add {
+    font: inherit;
+    font-weight: 600;
+    padding: 12px 18px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--accent);
+    color: var(--accent-fg);
+    cursor: pointer;
+  }
+  button.add:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
+  ul.items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  ul.items li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    min-height: 52px;
+    border-top: 1px solid var(--line);
+  }
+  ul.items li:first-child { border-top: 0; }
+  .name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+
+  .empty { margin: 0; padding: 28px 16px; text-align: center; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Meine Einkaufsliste</h1>
+    <p class="count" id="count"></p>
+  </header>
+
+  <form id="add-form" autocomplete="off">
+    <input type="text" id="item-input" placeholder="z. B. Milch, 2 kg Äpfel" aria-label="Neuer Artikel" enterkeyhint="done">
+    <button type="submit" class="add">Hinzufügen</button>
+  </form>
+
+  <ul class="items" id="list"></ul>
+  <p class="empty" id="empty" hidden>Noch nichts auf der Liste. Tippe oben einen Artikel ein.</p>
+</main>
+
+<script>
+  // Alle Artikel der Liste. Jeder Artikel hat einen Namen.
+  let items = [];
+
+  const form = document.getElementById("add-form");
+  const input = document.getElementById("item-input");
+  const list = document.getElementById("list");
+  const empty = document.getElementById("empty");
+  const count = document.getElementById("count");
+
+  // Zeichnet die Liste neu auf den Bildschirm.
+  function render() {
+    list.innerHTML = "";
+    for (const item of items) {
+      const li = document.createElement("li");
+      const name = document.createElement("span");
+      name.className = "name";
+      name.textContent = item.name;
+      li.appendChild(name);
+      list.appendChild(li);
+    }
+    list.hidden = items.length === 0;
+    empty.hidden = items.length !== 0;
+    count.textContent = items.length === 1 ? "1 Artikel" : items.length + " Artikel";
+  }
+
+  // Neuer Artikel über den Knopf "Hinzufügen" oder die Enter-Taste.
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const name = input.value.trim();
+    if (!name) return;
+    items.push({ name: name });
+    input.value = "";
+    input.focus();
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>
